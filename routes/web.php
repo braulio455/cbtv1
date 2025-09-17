@@ -127,9 +127,10 @@ Route::get('/preinscripciones/rechazar/{id}', [PreinscripcionController::class, 
 Route::get('/preinscripciones/notificar-admin', [PreinscripcionController::class, 'notificarAdmin'])->name('preinscripciones.notificar-admin');
 Route::get('/preinscripciones/notificar-estudiante', [PreinscripcionController::class, 'notificarEstudiante'])->name('preinscripciones.notificar-estudiante');
 
-Route::get('/landing', function () {
+Route::get('/', function () {
     return view('landing');
 })->name('landing');
+
 
 
     
