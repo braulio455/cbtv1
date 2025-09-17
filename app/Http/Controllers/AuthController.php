@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Log;
 
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Mail\VerificationCodeMail;
 use Illuminate\Http\Request;
@@ -20,17 +20,14 @@ class AuthController extends Controller
 
     public function showRegisterForm()
     {
-        // Verificar si ya existe un usuario registrado
         if (User::count() > 0) {
             return redirect()->route('login')->with('error', 'El sistema solo permite una cuenta registrada.');
         }
-        
         return view('auth.register');
     }
 
     public function register(Request $request)
     {
-        // Verificar si ya existe un usuario registrado
         if (User::count() > 0) {
             return redirect()->route('login')->with('error', 'El sistema solo permite una cuenta registrada.');
         }
@@ -51,16 +48,15 @@ class AuthController extends Controller
             'apellidos' => Crypt::encryptString($request->apellidos),
             'email' => Crypt::encryptString($request->email),
             'password' => Hash::make($request->password),
-            'is_admin' => true // Asignar como administrador
+            'is_admin' => true
         ]);
 
         $this->sendVerificationCode($user);
 
         Session::put('temp_user_id', $user->id);
-        return redirect()->route('verify')->with('success', 'Código enviado (válido por '.$this->codeExpiration.' minutos)');
+        return redirect()->route('verify')->with('success', 'Código enviado (válido por ' . $this->codeExpiration . ' minutos)');
     }
 
-    // Resto de los métodos permanecen igual...
     public function showVerifyForm()
     {
         if (!Session::has('temp_user_id') && !Auth::check()) {
@@ -72,7 +68,6 @@ class AuthController extends Controller
     public function verify(Request $request)
     {
         $request->validate(['code' => 'required|digits:6']);
-
         $user = $this->getUserFromSessionOrAuth();
 
         if (!$user) {
@@ -80,7 +75,7 @@ class AuthController extends Controller
         }
 
         if (!$user->isValidCode($request->code)) {
-            return back()->with('error', 'Código inválido o expirado (los códigos duran '.$this->codeExpiration.' minutos)');
+            return back()->with('error', 'Código inválido o expirado (los códigos duran ' . $this->codeExpiration . ' minutos)');
         }
 
         $user->is_verified = true;
@@ -124,8 +119,8 @@ class AuthController extends Controller
 
         $this->sendVerificationCode($user);
         Session::put('temp_user_id', $user->id);
-        
-        return redirect()->route('verify')->with('success', 'Código enviado (válido por '.$this->codeExpiration.' minutos)');
+
+        return redirect()->route('verify')->with('success', 'Código enviado (válido por ' . $this->codeExpiration . ' minutos)');
     }
 
     public function dashboard()
@@ -135,11 +130,11 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-        
+
         try {
             return view('dashboard', [
                 'user' => $user,
-                'nombre_completo' => $user->decrypted_nombres.' '.$user->decrypted_apellidos,
+                'nombre_completo' => $user->decrypted_nombres . ' ' . $user->decrypted_apellidos,
                 'iniciales' => $user->iniciales,
                 'email' => $user->decrypted_email
             ]);
@@ -179,7 +174,7 @@ class AuthController extends Controller
         $user->updatePassword($request->password);
         $this->sendVerificationCode($user);
         Session::put('reset_user_id', $user->id);
-        
+
         return redirect()->route('verify.reset')->with('success', 'Verifica el código para completar el cambio');
     }
 
@@ -194,7 +189,6 @@ class AuthController extends Controller
     public function verifyReset(Request $request)
     {
         $request->validate(['code' => 'required|digits:6']);
-
         $user = User::find(Session::get('reset_user_id'));
 
         if (!$user || !$user->isValidCode($request->code)) {
@@ -205,7 +199,7 @@ class AuthController extends Controller
         $user->code_expires_at = null;
         $user->save();
         Session::forget('reset_user_id');
-        
+
         return redirect()->route('login')->with('success', 'Contraseña restablecida correctamente.');
     }
 
@@ -245,38 +239,41 @@ class AuthController extends Controller
 
     protected function getUserFromSessionOrAuth()
     {
-        return Session::has('temp_user_id') 
-            ? User::find(Session::get('temp_user_id')) 
+        return Session::has('temp_user_id')
+            ? User::find(Session::get('temp_user_id'))
             : Auth::user();
     }
 
+    /**
+     * Envía el código de verificación al correo real (desencriptado).
+     */
     protected function sendVerificationCode(User $user)
     {
         $code = $user->generateVerificationCode();
-        
+
         try {
-            Mail::to($user->decrypted_email)
-                ->send(new VerificationCodeMail(
-                    $code, 
-                    $user->decrypted_nombres, 
+            $recipient = $user->decrypted_email;
+
+            Mail::to($recipient)->send(
+                new VerificationCodeMail(
+                    $code,
+                    $user->decrypted_nombres,
                     $this->codeExpiration
-                ));
-        } catch (DecryptException $e) {
-            Log::error('Error de desencriptación al enviar código de verificación', [
+                )
+            );
+
+            Log::info("✅ Código de verificación enviado", [
                 'user_id' => $user->id,
-                'error' => $e->getMessage(),
-                'exception' => $e
+                'email'   => $recipient,
+                'code'    => $code
             ]);
-            throw new \Exception("No se pudo enviar el código de verificación. Por favor, intente nuevamente.");
         } catch (\Exception $e) {
-            Log::error('Error al enviar código de verificación', [
+            Log::error("❌ Error al enviar correo SMTP", [
                 'user_id' => $user->id,
-                'error' => $e->getMessage(),
-                'exception' => $e,
-                'code' => $code,
-                'email_attempt' => $user->email
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString()
             ]);
-            throw new \Exception("Ocurrió un error al enviar el código de verificación.");
+            throw new \Exception("No se pudo enviar el código de verificación. Contacta al administrador.");
         }
     }
 }
