@@ -713,77 +713,126 @@
       }
     }
     
-    /* Responsive */
-    @media (max-width: 992px) {
-      .main-banner {
-        padding: 2rem 1.5rem;
-        min-height: auto;
-      }
-      
-      .banner-content {
-        flex-direction: column;
-        text-align: center;
-      }
-      
-      .logo-section {
-        padding-right: 0;
-        margin-bottom: 2rem;
-      }
-      
-      .info-section {
-        padding-left: 0;
-        border-left: none;
-      }
-      
-      .title-section h1 {
-        font-size: 1.8rem;
-      }
-      
-      .title-section h2 {
-        font-size: 1.2rem;
-      }
-      
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .cta-section {
-        flex-direction: column;
-        align-items: center;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .navbar-brand {
-        font-size: 1.3rem;
-      }
-      
-      #contenido-dinamico {
-        padding: 1.5rem;
-        margin: 1.5rem;
-      }
-      
-      .footer-grid {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-      
-      .footer-section h5::after {
-        left: 50%;
-        transform: translateX(-50%);
-      }
-      
-      .social-icons {
-        justify-content: center;
-      }
-      
-      .cycle-details {
-        grid-template-columns: 1fr;
-      }
-      
-      .careers-grid {
-        grid-template-columns: 1fr;
-      }
+   /* ================================
+   Responsive Design
+   ================================ */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 992px) {
+  .main-banner {
+    padding: 2rem 1.5rem;
+    min-height: auto;
+  }
+
+  .banner-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem; /* mejor separación entre bloques */
+  }
+
+  .logo-section {
+    padding-right: 0;
+    margin-bottom: 2rem;
+  }
+
+  .info-section {
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .title-section h1 {
+    font-size: 2rem;
+    line-height: 1.3;
+  }
+
+  .title-section h2 {
+    font-size: 1.3rem;
+    font-weight: 400;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .cta-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+
+/* Dispositivos pequeños: móviles */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+
+  #contenido-dinamico {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .footer-section h5::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .social-icons {
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .cycle-details,
+  .careers-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .title-section h1 {
+    font-size: 1.6rem;
+  }
+
+  .title-section h2 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Extra pequeño: móviles muy reducidos (≤480px) */
+@media (max-width: 480px) {
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+
+  .main-banner {
+    padding: 1.2rem 1rem;
+  }
+
+  .title-section h1 {
+    font-size: 1.4rem;
+  }
+
+  .title-section h2 {
+    font-size: 1rem;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-section button {
+    width: 100%;
+  }
+
+
     }
   </style>
 </head>
