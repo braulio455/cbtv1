@@ -42,18 +42,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Grupos y Programas
-    Route::prefix('grupos')->controller(GrupoController::class)->group(function () {
-        Route::get('/', 'index')->name('grupos.index');
-        Route::post('/', 'store')->name('grupos.store');
-        Route::put('/{grupo}', 'update')->name('grupos.update');
-        Route::delete('/{grupo}', 'destroy')->name('grupos.destroy');
+   // Grupos y Programas
+Route::prefix('grupos')->controller(GrupoController::class)->group(function () {
+    Route::get('/', 'index')->name('grupos.index');
+    Route::post('/', 'store')->name('grupos.store');
+    Route::put('/{grupo}', 'update')->name('grupos.update');
+    Route::delete('/{grupo}', 'destroy')->name('grupos.destroy');
 
-        Route::prefix('{grupo}/programas')->group(function () {
-            Route::post('/', 'storePrograma')->name('programas.store');
-            Route::put('/{programa}', 'updatePrograma')->name('programas.update');
-            Route::delete('/{programa}', 'destroyPrograma')->name('programas.destroy');
-        });
+    Route::prefix('{grupo}/programas')->group(function () {
+        Route::post('/', 'storePrograma')->name('programas.store');
+        // CAMBIO: Usar el ID del programa directamente en lugar de modelo
+        Route::put('/programa/{programa}', 'updatePrograma')->name('programas.update');
+        Route::delete('/programa/{programa}', 'destroyPrograma')->name('programas.destroy');
+    });
+
     });
 
     // Inscripciones

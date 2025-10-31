@@ -63,21 +63,26 @@ class GrupoController extends Controller
         return back()->with('success', '✅ Programa añadido correctamente.');
     }
 
-    public function updatePrograma(Request $request, Programa $programa)
+    public function updatePrograma(Request $request, $programa)
     {
+        // CAMBIO: Buscar el programa por ID en lugar de usar Route Model Binding
+        $programaModel = Programa::findOrFail($programa);
+        
         $request->validate([
-            'nombre' => 'required|max:100|unique:programas,nombre,' . $programa->id . ',id,grupo_id,' . $programa->grupo_id,
+            'nombre' => 'required|max:100|unique:programas,nombre,' . $programaModel->id . ',id,grupo_id,' . $programaModel->grupo_id,
             'descripcion' => 'nullable|max:255',
         ]);
 
-        $programa->update($request->only('nombre', 'descripcion'));
+        $programaModel->update($request->only('nombre', 'descripcion'));
 
         return back()->with('info', '✏️ Programa actualizado correctamente.');
     }
 
-    public function destroyPrograma(Programa $programa)
+    public function destroyPrograma($programa)
     {
-        $programa->delete();
+        // CAMBIO: Buscar el programa por ID en lugar de usar Route Model Binding
+        $programaModel = Programa::findOrFail($programa);
+        $programaModel->delete();
 
         return back()->with('danger', '🗑️ Programa eliminado correctamente.');
     }
